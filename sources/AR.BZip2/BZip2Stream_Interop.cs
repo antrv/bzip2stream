@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Runtime.InteropServices;
 
 namespace System.IO.Compression
 {
@@ -11,8 +7,7 @@ namespace System.IO.Compression
 #if EMBED_LIBBZIP2
 		private const string cLibbzip2 = "AR.BZip2.dll";
 #else
-		//private const string cLibbzip2 = "libbzip2.dll";
-		private const string cLibbzip2 = "AR.BZip2.dll";
+		private const string cLibbzip2 = "libbzip2.dll";
 #endif
 
 		private enum BzErrorCode
@@ -60,27 +55,21 @@ namespace System.IO.Compression
 		}
 
 		[DllImport(cLibbzip2)]
-		[return: MarshalAs(UnmanagedType.I4)]
-		private static extern BzErrorCode BZ2_bzCompressInit(IntPtr stream, [MarshalAs(UnmanagedType.I4)]BZip2CompressionLevel blockSize100k, int verbosity, int workFactor);
+		private static extern BzErrorCode BZ2_bzCompressInit(IntPtr stream, BZip2CompressionLevel blockSize100k, int verbosity, int workFactor);
 
 		[DllImport(cLibbzip2)]
-		[return: MarshalAs(UnmanagedType.I4)]
-		private static extern BzErrorCode BZ2_bzCompress(IntPtr stream, [MarshalAs(UnmanagedType.I4)]BzAction action);
+		private static extern BzErrorCode BZ2_bzCompress(IntPtr stream, BzAction action);
 
 		[DllImport(cLibbzip2)]
-		[return: MarshalAs(UnmanagedType.I4)]
 		private static extern BzErrorCode BZ2_bzCompressEnd(IntPtr stream);
 
 		[DllImport(cLibbzip2)]
-		[return: MarshalAs(UnmanagedType.I4)]
 		private static extern BzErrorCode BZ2_bzDecompressInit(IntPtr stream, int verbosity, int small);
 
 		[DllImport(cLibbzip2)]
-		[return: MarshalAs(UnmanagedType.I4)]
 		private static extern BzErrorCode BZ2_bzDecompress(IntPtr stream);
 
 		[DllImport(cLibbzip2)]
-		[return: MarshalAs(UnmanagedType.I4)]
 		private static extern BzErrorCode BZ2_bzDecompressEnd(IntPtr stream);
 	}
 }
