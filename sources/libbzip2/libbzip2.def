@@ -1,0 +1,9 @@
+LIBRARY			libbzip2
+DESCRIPTION		"libbzip2: library for data compression"
+EXPORTS
+	BZ2_bzCompressInit
+	BZ2_bzCompress
+	BZ2_bzCompressEnd
+	BZ2_bzDecompressInit
+	BZ2_bzDecompress
+	BZ2_bzDecompressEnd
