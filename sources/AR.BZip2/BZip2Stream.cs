@@ -6,20 +6,20 @@ namespace System.IO.Compression
 {
 	public partial class BZip2Stream: Stream
 	{
-		private const int cBufferSize = 128 * 1024;
-		private Stream _stream;
+		private const int BufferSize = 128 * 1024;
 		private readonly BZip2CompressionLevel _level;
 		private readonly CompressionMode _mode;
 		private readonly bool _leaveOpen;
 
-		private readonly byte[] _buffer = new byte[cBufferSize];
+		private readonly byte[] _buffer = new byte[BufferSize];
 		private int _bufferOffset;
 		private int _bufferLength;
 
 		private readonly BzStream _data;
-		private GCHandle _dataHandle;
 		private readonly IntPtr _dataAddr;
+	    private GCHandle _dataHandle;
 
+        private Stream _stream;
 		private bool _initialized;
 		private int _activeAsyncOperation;
 
@@ -32,14 +32,15 @@ namespace System.IO.Compression
 		public BZip2Stream(Stream stream, CompressionMode mode, bool leaveOpen)
 		{
 			if (stream == null)
-				throw new ArgumentNullException("stream", "stream is null.");
+				throw new ArgumentNullException(nameof(stream), "stream is null.");
 			if (mode != CompressionMode.Compress && mode != CompressionMode.Decompress)
-				throw new ArgumentException("mode is not a valid CompressionMode enumeration value.", "mode");
+				throw new ArgumentException("mode is not a valid CompressionMode enumeration value.", nameof(mode));
 			if (mode == CompressionMode.Compress && !stream.CanWrite)
-				throw new ArgumentException("CompressionMode is Compress and CanWrite is false.", "mode");
+				throw new ArgumentException("CompressionMode is Compress and CanWrite is false.", nameof(mode));
 			if (mode == CompressionMode.Decompress && !stream.CanRead)
-				throw new ArgumentException("CompressionMode is Decompress and CanRead is false.", "mode");
-			_stream = stream;
+				throw new ArgumentException("CompressionMode is Decompress and CanRead is false.", nameof(mode));
+
+		    _stream = stream;
 			_mode = mode;
 			_level = BZip2CompressionLevel.Default;
 			_leaveOpen = leaveOpen;
@@ -68,12 +69,13 @@ namespace System.IO.Compression
 		public BZip2Stream(Stream stream, BZip2CompressionLevel level, bool leaveOpen)
 		{
 			if (stream == null)
-				throw new ArgumentNullException("stream", "stream is null.");
+				throw new ArgumentNullException(nameof(stream), "stream is null.");
 			if (level < BZip2CompressionLevel.Lowest || level > BZip2CompressionLevel.Highest)
-				throw new ArgumentException("level is not a valid BZip2CompressionLevel enumeration value.", "level");
+				throw new ArgumentException("level is not a valid BZip2CompressionLevel enumeration value.", nameof(level));
 			if (!stream.CanWrite)
-				throw new ArgumentException("CanWrite is false.", "stream");
-			_stream = stream;
+				throw new ArgumentException("CanWrite is false.", nameof(stream));
+
+		    _stream = stream;
 			_level = level;
 			_mode = CompressionMode.Compress;
 			_leaveOpen = leaveOpen;
@@ -92,6 +94,11 @@ namespace System.IO.Compression
 			: this(stream, level, false)
 		{
 		}
+
+	    ~BZip2Stream()
+	    {
+            Dispose(false);
+	    }
 
 		private static BzErrorCode CheckErrorCode(BzErrorCode errorCode)
 		{
@@ -118,72 +125,36 @@ namespace System.IO.Compression
 		/// <summary>
 		/// Gets a reference to the underlying stream.
 		/// </summary>
-		public Stream BaseStream
-		{
-			get
-			{
-				return _stream;
-			}
-		}
+		public Stream BaseStream => _stream;
 
-		/// <summary>
-		/// Gets a value indicating whether the stream supports reading while decompressing a file.
-		/// </summary>
-		public override bool CanRead
-		{
-			get
-			{
-				return _mode == CompressionMode.Decompress && _stream.CanRead;
-			}
-		}
+	    /// <summary>
+	    /// Gets a value indicating whether the stream supports reading while decompressing a file.
+	    /// </summary>
+	    public override bool CanRead => _mode == CompressionMode.Decompress && _stream.CanRead;
 
-		/// <summary>
+	    /// <summary>
 		/// Gets a value indicating whether the stream supports writing.
 		/// </summary>
-		public override bool CanWrite
-		{
-			get
-			{
-				return _mode == CompressionMode.Compress && _stream.CanWrite;
-			}
-		}
+		public override bool CanWrite => _mode == CompressionMode.Compress && _stream.CanWrite;
 
-		/// <summary>
+	    /// <summary>
 		/// Gets a value indicating whether the stream supports seeking.
 		/// </summary>
-		public override bool CanSeek
-		{
-			get
-			{
-				return false;
-			}
-		}
+		public override bool CanSeek => false;
 
-		/// <summary>
+	    /// <summary>
 		/// This property is not supported and always throws a NotSupportedException.
 		/// </summary>
-		public override long Length
-		{
-			get
-			{
-				throw new NotSupportedException();
-			}
-		}
+		public override long Length => throw new NotSupportedException();
 
-		/// <summary>
+	    /// <summary>
 		/// This property is not supported and always throws a NotSupportedException.
 		/// </summary>
 		public override long Position
 		{
-			get
-			{
-				throw new NotSupportedException();
-			}
-			set
-			{
-				throw new NotSupportedException();
-			}
-		}
+			get => throw new NotSupportedException();
+	        set => throw new NotSupportedException();
+	    }
 
 		/// <summary>
 		/// Begins an asynchronous read operation.
@@ -200,20 +171,21 @@ namespace System.IO.Compression
 			if (_stream == null)
 				throw new ObjectDisposedException("The read operation cannot be performed because the stream is closed.");
 			if (buffer == null)
-				throw new ArgumentNullException("buffer");
+				throw new ArgumentNullException(nameof(buffer));
 			if (_mode != CompressionMode.Decompress)
 				throw new InvalidOperationException("The CompressionMode value was Compress when the object was created.");
 			if (!_stream.CanRead)
 				throw new InvalidOperationException("The underlying stream does not support reading.");
 			if (offset < 0)
-				throw new ArgumentOutOfRangeException("offset", "offset or count is less than zero.");
+				throw new ArgumentOutOfRangeException(nameof(offset), "offset or count is less than zero.");
 			if (count < 0)
-				throw new ArgumentOutOfRangeException("count", "offset or count is less than zero.");
+				throw new ArgumentOutOfRangeException(nameof(count), "offset or count is less than zero.");
 			if (buffer.Length - offset < count)
-				throw new ArgumentOutOfRangeException("count", "array length minus the index starting point is less than count.");
+				throw new ArgumentOutOfRangeException(nameof(count), "array length minus the index starting point is less than count.");
 
 			if (Interlocked.CompareExchange(ref _activeAsyncOperation, 1, 0) != 0)
 				throw new InvalidOperationException("Another asyncronious operation is active.");
+
 			Func<int> action = () => Read(buffer, offset, count);
 			BzAsyncResult asyncResult = new BzAsyncResult(action, callback, CallbackMethod, state);
 			if (asyncResult.CompletedSynchronously)
@@ -236,21 +208,22 @@ namespace System.IO.Compression
 			if (_stream == null)
 				throw new ObjectDisposedException("The write operation cannot be performed because the stream is closed.");
 			if (buffer == null)
-				throw new ArgumentNullException("buffer");
+				throw new ArgumentNullException(nameof(buffer));
 			if (_mode != CompressionMode.Compress)
 				throw new InvalidOperationException("The CompressionMode value was Decompress when the object was created.");
 			if (!_stream.CanWrite)
 				throw new InvalidOperationException("The underlying stream does not support writing.");
 			if (offset < 0)
-				throw new ArgumentOutOfRangeException("offset", "offset or count is less than zero.");
+				throw new ArgumentOutOfRangeException(nameof(offset), "offset or count is less than zero.");
 			if (count < 0)
-				throw new ArgumentOutOfRangeException("count", "offset or count is less than zero.");
+				throw new ArgumentOutOfRangeException(nameof(count), "offset or count is less than zero.");
 			if (buffer.Length - offset < count)
-				throw new ArgumentOutOfRangeException("count", "array length minus the index starting point is less than count.");
+				throw new ArgumentOutOfRangeException(nameof(count), "array length minus the index starting point is less than count.");
 
 			if (Interlocked.CompareExchange(ref _activeAsyncOperation, 1, 0) != 0)
 				throw new InvalidOperationException("Another asyncronious operation is active.");
-			Func<int> action = () =>
+
+		    Func<int> action = () =>
 			{
 				Write(buffer, offset, count);
 				return 0;
@@ -268,32 +241,34 @@ namespace System.IO.Compression
 		protected override void Dispose(bool disposing)
 		{
 			if (_initialized)
-				try
-				{
-					switch (_mode)
-					{
-						case CompressionMode.Compress:
-							FinalizeCompression();
-							break;
-						case CompressionMode.Decompress:
-							CheckErrorCode(BZ2_bzDecompressEnd(_dataAddr));
-							break;
-					}
-				}
-				finally
-				{
-					_initialized = false;
-					_dataHandle.Free();
-					try
-					{
-						if (!_leaveOpen)
-							_stream.Dispose();
-					}
-					finally
-					{
-						_stream = null;
-					}
-				}
+			{
+			    try
+			    {
+			        switch (_mode)
+			        {
+			            case CompressionMode.Compress:
+			                FinalizeCompression();
+			                break;
+			            case CompressionMode.Decompress:
+			                CheckErrorCode(BZ2_bzDecompressEnd(_dataAddr));
+			                break;
+			        }
+			    }
+			    finally
+			    {
+			        _initialized = false;
+			        _dataHandle.Free();
+			        try
+			        {
+			            if (!_leaveOpen && disposing)
+			                _stream.Dispose();
+			        }
+			        finally
+			        {
+			            _stream = null;
+			        }
+			    }
+			}
 		}
 
 		private void CallbackMethod(IAsyncResult result)
@@ -309,11 +284,13 @@ namespace System.IO.Compression
 		public override int EndRead(IAsyncResult asyncResult)
 		{
 			if (asyncResult == null)
-				throw new ArgumentNullException("asyncResult", "asyncResult is null.");
-			BzAsyncResult result = asyncResult as BzAsyncResult;
-			if (result == null)
-				throw new ArgumentException("asyncResult did not originate from a BeginRead method on the current stream.", "asyncResult");
-			//InvalidOperationException The end operation cannot be performed because the stream is closed.
+				throw new ArgumentNullException(nameof(asyncResult), "asyncResult is null.");
+
+		    BzAsyncResult result = asyncResult as BzAsyncResult;
+		    if (result == null)
+				throw new ArgumentException("asyncResult did not originate from a BeginRead method on the current stream.", nameof(asyncResult));
+
+		    // InvalidOperationException The end operation cannot be performed because the stream is closed.
 			return result.EndInvoke();
 		}
 
@@ -324,11 +301,13 @@ namespace System.IO.Compression
 		public override void EndWrite(IAsyncResult asyncResult)
 		{
 			if (asyncResult == null)
-				throw new ArgumentNullException("asyncResult", "asyncResult is null.");
+				throw new ArgumentNullException(nameof(asyncResult), "asyncResult is null.");
+
 			BzAsyncResult result = asyncResult as BzAsyncResult;
 			if (result == null)
-				throw new ArgumentException("asyncResult did not originate from a BeginWrite method on the current stream.", "asyncResult");
-			//InvalidOperationException The underlying stream is null. -or- The underlying stream is closed.
+				throw new ArgumentException("asyncResult did not originate from a BeginWrite method on the current stream.", nameof(asyncResult));
+
+			// InvalidOperationException The underlying stream is null. -or- The underlying stream is closed.
 			result.EndInvoke();
 		}
 
@@ -339,7 +318,8 @@ namespace System.IO.Compression
 		{
 			if (_stream == null)
 				throw new ObjectDisposedException("The read operation cannot be performed because the stream is closed.");
-			if (_mode == CompressionMode.Compress && _bufferOffset != 0)
+
+		    if (_mode == CompressionMode.Compress && _bufferOffset != 0)
 			{
 				_stream.Write(_buffer, 0, _bufferOffset);
 				_bufferOffset = 0;
@@ -358,17 +338,17 @@ namespace System.IO.Compression
 			if (_stream == null)
 				throw new ObjectDisposedException("The read operation cannot be performed because the stream is closed.");
 			if (buffer == null)
-				throw new ArgumentNullException("buffer");
+				throw new ArgumentNullException(nameof(buffer));
 			if (_mode != CompressionMode.Decompress)
 				throw new InvalidOperationException("The CompressionMode value was Compress when the object was created.");
 			if (!_stream.CanRead)
 				throw new InvalidOperationException("The underlying stream does not support reading.");
 			if (offset < 0)
-				throw new ArgumentOutOfRangeException("offset", "offset or count is less than zero.");
+				throw new ArgumentOutOfRangeException(nameof(offset), "offset or count is less than zero.");
 			if (count < 0)
-				throw new ArgumentOutOfRangeException("count", "offset or count is less than zero.");
+				throw new ArgumentOutOfRangeException(nameof(count), "offset or count is less than zero.");
 			if (buffer.Length - offset < count)
-				throw new ArgumentOutOfRangeException("count", "array length minus the index starting point is less than count.");
+				throw new ArgumentOutOfRangeException(nameof(count), "array length minus the index starting point is less than count.");
 
 			if (count == 0)
 				return 0;
@@ -385,7 +365,7 @@ namespace System.IO.Compression
 				{
 					if (_data.avail_in == 0)
 					{
-						_data.avail_in = _stream.Read(_buffer, 0, cBufferSize);
+						_data.avail_in = _stream.Read(_buffer, 0, BufferSize);
 						_data.next_in = input;
 					}
 
@@ -418,21 +398,15 @@ namespace System.IO.Compression
 		/// <param name="offset">The location in the stream.</param>
 		/// <param name="origin">One of the SeekOrigin values.</param>
 		/// <returns>A long value.</returns>
-		public override long Seek(long offset, SeekOrigin origin)
-		{
-			throw new NotSupportedException();
-		}
+		public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
-		/// <summary>
+	    /// <summary>
 		/// This property is not supported and always throws a NotSupportedException.
 		/// </summary>
 		/// <param name="value">The length of the stream.</param>
-		public override void SetLength(long value)
-		{
-			throw new NotSupportedException();
-		}
+		public override void SetLength(long value) => throw new NotSupportedException();
 
-		/// <summary>
+	    /// <summary>
 		/// Writes compressed bytes to the underlying stream from the specified byte array.
 		/// </summary>
 		/// <param name="buffer">The buffer that contains the data to compress.</param>
@@ -443,23 +417,23 @@ namespace System.IO.Compression
 			if (_stream == null)
 				throw new ObjectDisposedException("The write operation cannot be performed because the stream is closed.");
 			if (buffer == null)
-				throw new ArgumentNullException("buffer");
+				throw new ArgumentNullException(nameof(buffer));
 			if (_mode != CompressionMode.Compress)
 				throw new InvalidOperationException("The CompressionMode value was Decompress when the object was created.");
 			if (!_stream.CanWrite)
 				throw new InvalidOperationException("The underlying stream does not support writing.");
 			if (offset < 0)
-				throw new ArgumentOutOfRangeException("offset", "offset or count is less than zero.");
+				throw new ArgumentOutOfRangeException(nameof(offset), "offset or count is less than zero.");
 			if (count < 0)
-				throw new ArgumentOutOfRangeException("count", "offset or count is less than zero.");
+				throw new ArgumentOutOfRangeException(nameof(count), "offset or count is less than zero.");
 			if (buffer.Length - offset < count)
-				throw new ArgumentOutOfRangeException("count", "array length minus the index starting point is less than count.");
+				throw new ArgumentOutOfRangeException(nameof(count), "array length minus the index starting point is less than count.");
 
 			if (count == 0)
 				return;
 
 			_data.avail_in = count;
-			_data.avail_out = cBufferSize - _bufferOffset;
+			_data.avail_out = BufferSize - _bufferOffset;
 
 			fixed (byte* output = &_buffer[0], input = &buffer[offset])
 			{
@@ -476,23 +450,23 @@ namespace System.IO.Compression
 				{
 					if (_data.avail_out == 0)
 					{
-						_stream.Write(_buffer, 0, cBufferSize);
+						_stream.Write(_buffer, 0, BufferSize);
 						_bufferOffset = 0;
-						_data.avail_out = cBufferSize;
+						_data.avail_out = BufferSize;
 						_data.next_out = output;
 					}
 
 					CheckErrorCode(BZ2_bzCompress(_dataAddr, BzAction.BZ_RUN));
 				}
 
-				_bufferOffset = cBufferSize - _data.avail_out;
+				_bufferOffset = BufferSize - _data.avail_out;
 			}
 		}
 
 		private unsafe void FinalizeCompression()
 		{
 			_data.avail_in = 0;
-			_data.avail_out = cBufferSize - _bufferOffset;
+			_data.avail_out = BufferSize - _bufferOffset;
 			_data.next_in = null;
 
 			try
@@ -511,20 +485,20 @@ namespace System.IO.Compression
 					{
 						if (_data.avail_out == 0)
 						{
-							_stream.Write(_buffer, 0, cBufferSize);
+							_stream.Write(_buffer, 0, BufferSize);
 							_bufferOffset = 0;
-							_data.avail_out = cBufferSize;
+							_data.avail_out = BufferSize;
 							_data.next_out = output;
 						}
 						errorCode = BZ2_bzCompress(_dataAddr, BzAction.BZ_FINISH);
 						CheckErrorCode(errorCode);
 					}
-					_bufferOffset = cBufferSize - _data.avail_out;
+					_bufferOffset = BufferSize - _data.avail_out;
 					if (_bufferOffset > 0)
 					{
 						_stream.Write(_buffer, 0, _bufferOffset);
 						_bufferOffset = 0;
-						_data.avail_out = cBufferSize;
+						_data.avail_out = BufferSize;
 						_data.next_out = output;
 					}
 				}

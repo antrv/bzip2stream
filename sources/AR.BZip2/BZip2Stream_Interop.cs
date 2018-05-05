@@ -5,9 +5,9 @@ namespace System.IO.Compression
 	partial class BZip2Stream
 	{
 #if EMBED_LIBBZIP2
-		private const string cLibbzip2 = "AR.BZip2.dll";
+		private const string DllName = "AR.BZip2.dll";
 #else
-		private const string cLibbzip2 = "libbzip2.dll";
+		private const string DllName = "libbzip2.dll";
 #endif
 
 		private enum BzErrorCode
@@ -54,22 +54,22 @@ namespace System.IO.Compression
 			BZ_FINISH = 2,
 		}
 
-		[DllImport(cLibbzip2)]
-		private static extern BzErrorCode BZ2_bzCompressInit(IntPtr stream, BZip2CompressionLevel blockSize100k, int verbosity, int workFactor);
+		[DllImport(DllName)]
+		private static extern BzErrorCode BZ2_bzCompressInit(IntPtr stream, BZip2CompressionLevel blockSize100K, int verbosity, int workFactor);
 
-		[DllImport(cLibbzip2)]
+		[DllImport(DllName)]
 		private static extern BzErrorCode BZ2_bzCompress(IntPtr stream, BzAction action);
 
-		[DllImport(cLibbzip2)]
+		[DllImport(DllName)]
 		private static extern BzErrorCode BZ2_bzCompressEnd(IntPtr stream);
 
-		[DllImport(cLibbzip2)]
+		[DllImport(DllName)]
 		private static extern BzErrorCode BZ2_bzDecompressInit(IntPtr stream, int verbosity, int small);
 
-		[DllImport(cLibbzip2)]
+		[DllImport(DllName)]
 		private static extern BzErrorCode BZ2_bzDecompress(IntPtr stream);
 
-		[DllImport(cLibbzip2)]
+		[DllImport(DllName)]
 		private static extern BzErrorCode BZ2_bzDecompressEnd(IntPtr stream);
 	}
 }
