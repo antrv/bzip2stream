@@ -7,4 +7,4 @@
 
 #include <SDKDDKVer.h>
 
-#define LIBBZIP2_VERSION 0.9.0.0
+#define LIBBZIP2_VERSION 1.0.8

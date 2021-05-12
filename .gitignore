@@ -2,9 +2,9 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-.bin
+**/bin
 .vs
 .tmp
-obj
+**/obj
 *.vcxproj.user
 *.csproj.user

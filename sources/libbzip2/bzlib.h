@@ -8,8 +8,8 @@
    This file is part of bzip2/libbzip2, a program and library for
    lossless, block-sorting data compression.
 
-   bzip2/libbzip2 version 1.0.6 of 6 September 2010
-   Copyright (C) 1996-2010 Julian Seward <jseward@bzip.org>
+   bzip2/libbzip2 version 1.0.8 of 13 July 2019
+   Copyright (C) 1996-2019 Julian Seward <jseward@acm.org>
 
    Please read the WARNING, DISCLAIMER and PATENTS sections in the 
    README file.
@@ -83,7 +83,7 @@ typedef
 #   endif
 #   ifdef BZ_EXPORT
 #   define BZ_API(func) WINAPI func
-#   define BZ_EXTERN __declspec( dllexport )
+#   define BZ_EXTERN extern
 #   else
    /* import windows dll dynamically */
 #   define BZ_API(func) (WINAPI * func)

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2043
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{C5809018-6D4B-43BB-8BEB-6EE8D0ADBCBB}"
 EndProject
@@ -10,19 +10,18 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbzip2.embedded", "libbzi
 		{9592E0AE-C653-48F7-B635-2C1C090758CC} = {9592E0AE-C653-48F7-B635-2C1C090758CC}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AR.BZip2", "AR.BZip2\AR.BZip2.csproj", "{34EE9780-F2DB-42F0-AA3C-F3A5F3AECFD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AR.BZip2", "AR.BZip2\AR.BZip2.csproj", "{34EE9780-F2DB-42F0-AA3C-F3A5F3AECFD9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9410B2CE-01DF-4973-8779-080586ECBC2F} = {9410B2CE-01DF-4973-8779-080586ECBC2F}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AR.BZip2.Embedded", "AR.BZip2\AR.BZip2.Embedded.csproj", "{9592E0AE-C653-48F7-B635-2C1C090758CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AR.BZip2.Embedded", "AR.BZip2\AR.BZip2.Embedded.csproj", "{9592E0AE-C653-48F7-B635-2C1C090758CC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbzip2", "libbzip2\libbzip2.vcxproj", "{9410B2CE-01DF-4973-8779-080586ECBC2F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Files", "Files", "{3092EEC1-9430-4C66-87AE-D0E34444F8DA}"
 	ProjectSection(SolutionItems) = preProject
 		..\.gitignore = ..\.gitignore
-		..\bzip2-LICENSE = ..\bzip2-LICENSE
 		..\LICENSE = ..\LICENSE
 		..\README.md = ..\README.md
 	EndProjectSection
@@ -71,8 +70,8 @@ Global
 		{34EE9780-F2DB-42F0-AA3C-F3A5F3AECFD9}.Release|x64.Build.0 = Release|Any CPU
 		{34EE9780-F2DB-42F0-AA3C-F3A5F3AECFD9}.Release|x86.ActiveCfg = Release|Any CPU
 		{34EE9780-F2DB-42F0-AA3C-F3A5F3AECFD9}.Release|x86.Build.0 = Release|Any CPU
-		{9592E0AE-C653-48F7-B635-2C1C090758CC}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{9592E0AE-C653-48F7-B635-2C1C090758CC}.Debug|Any CPU.Build.0 = Debug|x86
+		{9592E0AE-C653-48F7-B635-2C1C090758CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9592E0AE-C653-48F7-B635-2C1C090758CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9592E0AE-C653-48F7-B635-2C1C090758CC}.Debug|x64.ActiveCfg = Debug|x64
 		{9592E0AE-C653-48F7-B635-2C1C090758CC}.Debug|x64.Build.0 = Debug|x64
 		{9592E0AE-C653-48F7-B635-2C1C090758CC}.Debug|x86.ActiveCfg = Debug|x86
